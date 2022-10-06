@@ -61,6 +61,7 @@ export const Page = () => {
     }, [touchStartHandler, touchEndHandler]);
 
     const touchMoveHandler = (e: TouchEvent) => {
+        cancelTimeout(timer);
         console.log(`X ${e.touches[0].radiusX} ${e.touches[0].radiusY}`);
     }
 
