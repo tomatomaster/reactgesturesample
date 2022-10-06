@@ -31,13 +31,13 @@ export const Page = () => {
     const [touchedPosition, setTouchedPosition] = useState<[number, number]>([0, 0]);
     const timer = useRef<Array<number>>(new Array());
     const [enableGesture, setEnableGesture] = useState(false);
-    const [gestureDelta, setGestureDelta] = useState(0.03);
+    const [gestureDelta, setGestureDelta] = useState(1);
     const { ref, style } = useOriginalGesture();
 
 
     const gestureModeEnable = useCallback((e: TouchEvent) => {
         for (let i = 0; i < e.touches.length; i++) {
-            if (width * (gestureDelta / 1000) < e.touches[i].radiusX) {
+            if (width * (gestureDelta / 100000) < e.touches[i].radiusX) {
                 setEnableGesture(true);
             } else {
                 setEnableGesture(false);
