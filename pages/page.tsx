@@ -59,6 +59,7 @@ export const Page = () => {
     }, []);
 
     const showContextMenue = useCallback(() => {
+        setShowContext(false);
         setShowContext(true);
     }, [setShowContext]);
 
