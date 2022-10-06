@@ -1,5 +1,5 @@
 import { useDrag } from "@use-gesture/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { animated, useSpring, useSprings } from "react-spring";
 import Divider from '@mui/material/Divider';
 import Paper from '@mui/material/Paper';
@@ -32,41 +32,42 @@ export const Page = () => {
     const timer = useRef<Array<number>>(new Array());
     const { ref, style } = useOriginalGesture();
 
-    const calStart = useCallback((_e: TouchEvent) => {
-        const timerId = window.setTimeout(() => {
-            console.log('longPress!!')
-            setShowContext(true);
-        }, 1500);
-        console.log(`Click ${timer.current}`);
+    const touchStartHandler = useCallback((_e: TouchEvent) => {
+        const timerId = window.setTimeout(showContextMenue, 1500);
         timer.current.push(timerId);
         setTouchedPosition([_e.touches[0].clientX, _e.touches[0].clientY]);
     }, []);
 
-    const calEnd = useCallback((_e: TouchEvent) => {
-        console.log(timer);
-        timer.current.forEach(timer => {
-            console.log(`Clear ${timer}`);
-            window.clearTimeout(timer);
-        })
-        timer.current = new Array();
+    const touchEndHandler = useCallback((_e: TouchEvent) => {
+        cancelTimeout(timer);
     }, []);
+
+    const showContextMenue = useCallback(() => {
+        setShowContext(true);
+    }, [setShowContext]);
 
     useEffect(() => {
         setWidth(window.innerWidth);
-        window.addEventListener('touchmove', a);
-        window.addEventListener('touchstart', calStart);
-        window.addEventListener('touchend', calEnd);
+        window.addEventListener('touchmove', touchMoveHandler);
+        window.addEventListener('touchstart', touchStartHandler);
+        window.addEventListener('touchend', touchEndHandler);
         return () => {
-            window.removeEventListener('touchmove', a);
-            window.removeEventListener('touchstart', calStart);
-            window.removeEventListener('touchend', calEnd);
+            window.removeEventListener('touchmove', touchMoveHandler);
+            window.removeEventListener('touchstart', touchStartHandler);
+            window.removeEventListener('touchend', touchEndHandler);
         }
-    }, [calStart, calEnd]);
+    }, [touchStartHandler, touchEndHandler]);
 
-    const a = (e: TouchEvent) => {
+    const touchMoveHandler = (e: TouchEvent) => {
         console.log(`X ${e.touches[0].radiusX} ${e.touches[0].radiusY}`);
     }
 
+    function cancelTimeout(timer: MutableRefObject<number[]>) {
+        timer.current.forEach(timer => {
+            window.clearTimeout(timer);
+        });
+        timer.current = new Array();
+    }
 
 
     const [props, api] = useSprings(pages.length, i => ({
@@ -111,8 +112,8 @@ export const Page = () => {
         return (
             <Paper sx={{ width: 320, maxWidth: '100%' }}>
                 <MenuList>
-                    <MenuItem>
-                        <ListItemIcon onClick={() => { setShowContext(false) }}>
+                    <MenuItem onClick={() => { setShowContext(false) }}>
+                        <ListItemIcon>
                             <ContentCut fontSize="small" />
                         </ListItemIcon>
                         <ListItemText>Cut</ListItemText>
@@ -152,3 +153,5 @@ export const Page = () => {
 }
 
 export default Page
+
+
