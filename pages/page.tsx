@@ -35,8 +35,10 @@ export const Page = () => {
     const touchStartHandler = useCallback((_e: TouchEvent) => {
         const timerId = window.setTimeout(showContextMenue, 1500);
         timer.current.push(timerId);
-        setTouchedPosition([_e.touches[0].clientX, _e.touches[0].clientY]);
-    }, []);
+        if (!showContext) {
+            setTouchedPosition([_e.touches[0].clientX, _e.touches[0].clientY]);
+        }
+    }, [showContext]);
 
     const touchEndHandler = useCallback((_e: TouchEvent) => {
         cancelTimeout(timer);
