@@ -37,7 +37,7 @@ export const Page = () => {
 
     const gestureModeEnable = useCallback((e: TouchEvent) => {
         for (let i = 0; i < e.touches.length; i++) {
-            if (width * gestureDelta < e.touches[i].radiusX) {
+            if (width * (gestureDelta / 1000) < e.touches[i].radiusX) {
                 setEnableGesture(true);
             } else {
                 setEnableGesture(false);
@@ -111,7 +111,7 @@ export const Page = () => {
         <>
             <animated.div className={styles.card} ref={ref} style={style}></animated.div>
             <input value={gestureDelta} inputMode='numeric' onChange={(event) => setGestureDelta(Number(event.target.value))} />
-            <text>Gesture: {enableGesture}</text>
+            <text>Gesture: {enableGesture ? 'Enable' : 'Disable'}</text>
             <div style={{ display: showContext ? "block" : "none", position: 'fixed', left: `${touchedPosition[0]}px`, top: `${touchedPosition[1]}px` }}>
                 <IconMenu></IconMenu>
             </div>
