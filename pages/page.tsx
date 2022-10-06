@@ -30,15 +30,29 @@ export const Page = () => {
     const [showContext, setShowContext] = useState<boolean>(false);
     const [touchedPosition, setTouchedPosition] = useState<[number, number]>([0, 0]);
     const timer = useRef<Array<number>>(new Array());
+    const [enableGesture, setEnableGesture] = useState(false);
+    const [gestureDelta, setGestureDelta] = useState(0.03);
     const { ref, style } = useOriginalGesture();
 
-    const touchStartHandler = useCallback((_e: TouchEvent) => {
+
+    const gestureModeEnable = useCallback((e: TouchEvent) => {
+        for (let i = 0; i < e.touches.length; i++) {
+            if (width * gestureDelta < e.touches[i].radiusX) {
+                setEnableGesture(true);
+            } else {
+                setEnableGesture(false);
+            }
+        }
+    }, [gestureDelta]);
+
+    const touchStartHandler = useCallback((event: TouchEvent) => {
         const timerId = window.setTimeout(showContextMenue, 1500);
         timer.current.push(timerId);
         if (!showContext) {
-            setTouchedPosition([_e.touches[0].clientX, _e.touches[0].clientY]);
+            setTouchedPosition([event.touches[0].clientX, event.touches[0].clientY]);
         }
-    }, [showContext]);
+        gestureModeEnable(event);
+    }, [showContext, gestureModeEnable]);
 
     const touchEndHandler = useCallback((_e: TouchEvent) => {
         cancelTimeout(timer);
@@ -73,6 +87,7 @@ export const Page = () => {
     }
 
 
+
     const [props, api] = useSprings(pages.length, i => ({
         x: i * width,
         scale: 1,
@@ -95,6 +110,8 @@ export const Page = () => {
     return (
         <>
             <animated.div className={styles.card} ref={ref} style={style}></animated.div>
+            <input value={gestureDelta} inputMode='numeric' onChange={(event) => setGestureDelta(Number(event.target.value))} />
+            <text>Gesture: {enableGesture}</text>
             <div style={{ display: showContext ? "block" : "none", position: 'fixed', left: `${touchedPosition[0]}px`, top: `${touchedPosition[1]}px` }}>
                 <IconMenu></IconMenu>
             </div>
